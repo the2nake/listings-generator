@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Listings generator</title>
+    <link rel="icon" href="https://webpack.js.org/favicon.f326220248556af65f41.ico" />
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
+    <script src="https://kit.fontawesome.com/795a0e91da.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="app-section">
+        <h2>1 - Input file</h2>
+        <p>Click on the button below to upload the current listing code.</p>
+        <button id="fileUploadButton" class="btn-upload" onclick="document.getElementById('codeInput').click()"></pre><i
+                class="fa-solid fa-upload"></i><span style="margin-left: 6px;">Upload File</span></button>
+        <input id="codeInput" type="file" accept="text/html" name="codeInputFile" />
+    </div>
+    <div class="app-section">
+        <h2>2 - Code preview</h2>
+        <p>Don't worry if this looks nothing like the final result. I have no idea where to get the relevant css styles.
+        </p>
+        <p id="codePreview">No code uploaded.</p>
+    </div>
+    <div class="app-section">
+        <h2>3 - Edit listing</h2>
+        <p>Click a field in the code preview to edit it.</p>
+    </div>
+    <div class="app-section">
+        <h2>4 - Download</h2>
+        <p>Click the button below to download the code.</p>
+        <button class="btn-download"><i class="fa-solid fa-download"></i> Download</button>
+    </div>
+
+
+    <script src="js/main.js"></script>
+</body>
+
+</html>

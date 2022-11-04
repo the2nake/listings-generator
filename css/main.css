@@ -1,0 +1,93 @@
+html {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+body {
+    font-family: sans-serif;
+    width: 67%;
+    padding: 8px;
+}
+
+p {
+    margin: 12px 0;
+}
+
+.app-section {
+    padding: 12px;
+    background: skyblue;
+    border: 2px solid lightblue;
+    border-radius: 6px;
+    margin: 8px 0;
+}
+
+#codeInput {
+    display: none;
+}
+
+.btn-download, .btn-upload {
+    border: none;
+    padding: 8px;
+    border-radius: 4px;
+    background: lightcyan;
+    color: black;
+}
+
+.hover-input-container {
+    padding: 4px;
+    position: absolute;
+    border-radius: 4px;
+    background: lightseagreen;
+}
+
+.hover-input-container input {
+    border: 0;
+    border-radius: 2px;
+}
+
+.hover-input-container input:not(:last-child) {
+    margin-right: 4px;
+}
+
+#codePreview {
+    padding: 16px;
+    font-size: 12px;
+    font-family: sans-serif;
+    border: 2px solid #5BC0DE;
+    border-radius: 4px;
+}
+
+#codePreview ul li {
+    margin: 12px 0;
+}
+
+#codePreview .btn {
+    padding: 6px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+#codePreview .bg-info {
+    background: #5BC0DE;
+}
+
+#codePreview .bg-success {
+    background: #5CB85C;
+}
+
+#codePreview .bg-secondary {
+    background: #6C757D;
+}
+
+#codePreview .bg-danger {
+    background: #D9534F;
+}
+
+#codePreview .bg-warning {
+    background: #F0AD4E;
+}
+
+#codePreview .bg-light {
+    background: #F8F9FA;
+}
