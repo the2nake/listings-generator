@@ -12,7 +12,7 @@
     <div class="app-section">
         <h2>1 - Input file</h2>
         <p>Click on the button below to upload the current listing code.</p>
-        <button id="fileUploadButton" class="btn-upload" onclick="document.getElementById('codeInput').click()"></pre><i
+        <button id="fileUploadButton" class="btn-upload" onclick="document.getElementById('codeInput').click()"><i
                 class="fa-solid fa-upload"></i><span style="margin-left: 6px;">Upload File</span></button>
         <input id="codeInput" type="file" accept="text/html" name="codeInputFile" />
     </div>
@@ -24,7 +24,13 @@
     </div>
     <div class="app-section">
         <h2>3 - Edit listing</h2>
-        <p>Click a field in the code preview to edit it.</p>
+        <p>Click a field in the code preview to edit it. Click the button below to add a new row.</p>
+        <button class="btn-addrow" onclick="addRowCallback()"><i class="fas fa-plus"></i></button>
+        <p>[unimplemented] Shift and click to delete a trait, changelog entry, or tradelog entry. Press "X" and click to delete a row.
+        </p>
+        <p>
+            Changing the traits, changelog, and tradelog are currently incomplete.
+        </p>
     </div>
     <div class="app-section">
         <h2>4 - Download</h2>
