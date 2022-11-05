@@ -1,3 +1,50 @@
+function IDFieldEditCallback(e) {
+    e = e || window.event;
+    /** @type HTMLElement */
+    e.target;
+    if (e.target.querySelector("div") != null && e.target.querySelector("div").classList.contains("temp-hover")) {
+        return;
+    }
+
+    if (e.target.getElementsByTagName("div").length == 0) {
+        var hoverInputContainer = document.createElement("div");
+        var hoverInput = document.createElement("input");
+
+        hoverInput.value = e.target.innerText;
+        hoverInput.classList.add("temp-hover");
+        hoverInputContainer.appendChild(hoverInput);
+        hoverInputContainer.classList.add("hover-input-container");
+        hoverInputContainer.classList.add("temp-hover");
+
+        ///** @type DOMRect */
+        var rect = e.target.getBoundingClientRect();
+        //hoverInputContainer.style.top = (e.target.scrollTop + rect.top + rect.height / 2 + 6) + "px";
+        //hoverInputContainer.style.left = rect.left + "px";
+        hoverInput.style.width = rect.width + "px";
+
+        e.target.appendChild(hoverInputContainer);
+
+        e.target.onkeydown = function (event) {
+            e = e || window.event;
+
+            var inputEl = e.target.getElementsByTagName("input")[0];
+            if (event.keyCode == 13 && inputEl.value != "") {
+                // modifying the relevant id values
+                // if there is no div or a element this will fail
+                e.target.parentElement.children[5].querySelector("a").href = "#traits-" + inputEl.value;
+                e.target.parentElement.children[5].querySelector("div.collapse").id = "traits-" + inputEl.value;
+                e.target.parentElement.children[6].querySelector("a").href = "#change-" + inputEl.value;
+                e.target.parentElement.children[6].querySelector("div.collapse").id = "change-" + inputEl.value;
+                e.target.parentElement.children[7].querySelector("a").href = "#trade-" + inputEl.value;
+                e.target.parentElement.children[7].querySelector("div.collapse").id = "trade-" + inputEl.value;
+                console.log(e.target.parentElement.children[5].querySelector("a").href);
+                // this already deletes the input box
+                e.target.innerText = inputEl.value;
+            }
+        }
+    }
+}
+
 function fieldEditCallback(e) {
     e = e || window.event;
     /** @type HTMLElement */
@@ -15,7 +62,7 @@ function fieldEditCallback(e) {
         hoverInputContainer.appendChild(hoverInput);
         hoverInputContainer.classList.add("hover-input-container");
         hoverInputContainer.classList.add("temp-hover");
-        
+
         ///** @type DOMRect */
         var rect = e.target.getBoundingClientRect();
         //hoverInputContainer.style.top = (e.target.scrollTop + rect.top + rect.height / 2 + 6) + "px";
@@ -173,8 +220,11 @@ function initializeEditor(filestring) {
     let listingTableEls = previewEl.querySelectorAll("table.table tbody");
     var listingRowEls = listingTableEls[listingTableEls.length - 1].getElementsByTagName("tr");
     for (var i = 0; i < listingRowEls.length; i++) {
+        listingRowEls[i].classList.add("valid-delete-target");
         var currentRowEls = listingRowEls[i].getElementsByTagName("td");
-        for (var j = 0; j < 3; j++) {
+        currentRowEls[0].onclick = IDFieldEditCallback;
+        currentRowEls[0].classList.add("valid-target");
+        for (var j = 1; j < 3; j++) {
             currentRowEls[j].onclick = fieldEditCallback;
             currentRowEls[j].classList.add("valid-target");
         }
@@ -182,6 +232,7 @@ function initializeEditor(filestring) {
         currentRowEls[3].getElementsByTagName("a")[0].classList.add("valid-target");
         currentRowEls[4].onclick = raritySelectorCallback;
         currentRowEls[4].classList.add("valid-target");
+        currentRowEls[5].querySelector("div");
     }
 }
 
@@ -220,7 +271,7 @@ function addRowCallback() {
         </div>
     </td>`;
     listingTableEl.appendChild(blankTableRow);
-    
+
     var currentRowEls = blankTableRow.getElementsByTagName("td");
     for (var j = 0; j < 3; j++) {
         currentRowEls[j].onclick = fieldEditCallback;
