@@ -18,24 +18,26 @@
     </div>
     <div class="app-section">
         <h2>2 - Code preview</h2>
-        <p>Don't worry if this looks nothing like the final result. I have no idea where to get the relevant css styles.
+        <p>Don't worry if this looks nothing like the final result. I have no idea where to get the bootstrap theme.
         </p>
         <p id="codePreview">No code uploaded.</p>
     </div>
     <div class="app-section">
         <h2>3 - Edit listing</h2>
         <p>Click a field in the code preview to edit it. Click the button below to add a new row.</p>
-        <button class="btn-addrow" onclick="addRowCallback()"><i class="fas fa-plus"></i></button>
-        <p>[unimplemented] Shift and click to delete a trait, changelog entry, or tradelog entry. Press "X" and click to delete a row.
+        <button class="btn-add" onclick="addRowCallback()"><i class="fas fa-plus"></i><span style="margin-left: 6px;">Add row</span></button>
+        <p>Use the buttons below to toggle deleting rows and entries (like changlog entries, or traits). While the relevant mode is active, click with the mouse on a row/entry to delete it.
         </p>
+        <button id="removeRowToggleButton" class="btn-remove btn-inactive" onclick="toggleRemoveRow()"><i class="fas fa-minus"></i><span style="margin-left: 6px;">Remove Row Mode</span></button>
+        <button id="removeEntryToggleButton" class="btn-remove btn-inactive" onclick="toggleRemoveEntry()"><i class="fas fa-minus"></i><span style="margin-left: 6px;">Remove Entry mode</span></button>
         <p>
             Changing the traits, changelog, and tradelog are currently incomplete.
         </p>
     </div>
     <div class="app-section">
         <h2>4 - Download</h2>
-        <p>Click the button below to download the code.</p>
-        <button class="btn-download"><i class="fa-solid fa-download"></i> Download</button>
+        <p>Click the button below to download the code. After pressing this button, you must refresh the page and input the saved code in order to continue editing.</p>
+        <button id="download-code-button" class="btn-download"><i class="fa-solid fa-download"></i> Download</button>
     </div>
 
 

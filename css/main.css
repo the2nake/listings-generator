@@ -26,12 +26,20 @@ p {
     display: none;
 }
 
-.btn-download, .btn-upload {
+.btn-download, .btn-upload, .btn-add, .btn-remove {
     border: none;
     padding: 8px;
     border-radius: 4px;
     background: lightcyan;
     color: black;
+}
+
+.btn-remove {
+    background: lightcoral;
+}
+
+.btn-remove.btn-inactive {
+    background: #ad5c5c;
 }
 
 .hover-input-container {

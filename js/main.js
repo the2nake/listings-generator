@@ -87,7 +87,7 @@ function linkEditCallback(e) {
     e = e || window.event;
     e.preventDefault();
     /** @type HTMLElement */
-    let target = e.target;
+    var target = e.target;
 
     if (target.nodeName = "A") {
         target = target.parentElement;
@@ -122,12 +122,12 @@ function linkEditCallback(e) {
 
     var linkEditSubmitCallback = function (e) {
         e = e || window.event;
-        let target = e.target.parentElement;
-        let inputtedName = target.children[0].value;
-        let inputtedLink = target.children[1].value;
+        var target = e.target.parentElement;
+        var inputtedName = target.children[0].value;
+        var inputtedLink = target.children[1].value;
         if (e.keyCode == 13 && inputtedName != "" && inputtedLink != "") {
             /** @type HTMLElement */
-            let linkEl = target.parentElement.getElementsByTagName("a")[0];
+            var linkEl = target.parentElement.getElementsByTagName("a")[0];
             linkEl.href = inputtedLink;
             linkEl.innerHTML = `<i class="fas fa-heart"></i>` + inputtedName;
             target.parentElement.removeChild(target);
@@ -141,7 +141,7 @@ function raritySelectedCallback(e) {
     e = e || window.event;
     e.preventDefault();
     /** @type HTMLElement */
-    let target = e.target;
+    var target = e.target;
 
     while (!target.classList.contains("btn")) {
         target = target.parentElement;
@@ -161,7 +161,7 @@ function raritySelectorCallback(e) {
     e = e || window.event;
     e.preventDefault();
     /** @type HTMLElement */
-    let target = e.target;
+    var target = e.target;
 
     while (target != null) {
         if (target.classList.contains("valid-target")) {
@@ -214,13 +214,36 @@ function raritySelectorCallback(e) {
     target.appendChild(hoverInputContainer);
 }
 
+function addTraitCallback(e) {
+    e = e || window.event;
+
+    var target = e.target;
+
+    deleteRowMode = false;
+    deleteEntryMode = false;
+    document.getElementById('removeRowToggleButton').classList.add("btn-inactive");
+    document.getElementById('removeEntryToggleButton').classList.add("btn-inactive");
+
+    while (target.tagName != "LI") {
+        target = target.parentElement;
+        if (target.tagName == "BODY") {
+            console.error("Click target not contained within an <li> tag. Cannot insert new trait.");
+            return;
+        }
+    }
+    var newTraitEl = document.createElement("li");
+    newTraitEl.classList.add("valid-deleteentry-target");
+    newTraitEl.innerHTML = `<a class="btn btn-sm bg-info tooltipster" data-toggle="tooltip" title="Common">TRAIT</a>`;
+    target.parentElement.insertBefore(newTraitEl, target);
+}
+
 function initializeEditor(filestring) {
     var previewEl = document.getElementById("codePreview");
     previewEl.innerHTML = filestring;
-    let listingTableEls = previewEl.querySelectorAll("table.table tbody");
+    var listingTableEls = previewEl.querySelectorAll("table.table tbody");
     var listingRowEls = listingTableEls[listingTableEls.length - 1].getElementsByTagName("tr");
-    for (var i = 0; i < listingRowEls.length; i++) {
-        listingRowEls[i].classList.add("valid-delete-target");
+    for (let i = 0; i < listingRowEls.length; i++) {
+        listingRowEls[i].classList.add("valid-deleterow-target");
         var currentRowEls = listingRowEls[i].getElementsByTagName("td");
         currentRowEls[0].onclick = IDFieldEditCallback;
         currentRowEls[0].classList.add("valid-target");
@@ -232,17 +255,45 @@ function initializeEditor(filestring) {
         currentRowEls[3].getElementsByTagName("a")[0].classList.add("valid-target");
         currentRowEls[4].onclick = raritySelectorCallback;
         currentRowEls[4].classList.add("valid-target");
-        currentRowEls[5].querySelector("div");
+
+        // make all entries deletable
+        var entryEls = listingRowEls[i].querySelectorAll("div.collapse li");
+        console.log(entryEls);
+        for (let k = 0; k < entryEls.length; k++) {
+            entryEls[k].classList.add("valid-deleteentry-target");
+        }
+
+        // put this after so the button isn't marked as deletable
+        var traitTDEl = currentRowEls[5];
+        if (traitTDEl.querySelector("li") == null) {
+            traitTDEl.innerHTML = `<a data-toggle="collapse" href="#traits-${currentRowEls[0].innerText}">View All</a>
+            <div class="collapse" id="traits-${currentRowEls[0].innerText}">
+                <ul class="list-unstyled">
+                    <li><button class="btn-add" onclick="addTraitCallback()"><i class="fas fa-plus"></i></button></li>
+                </ul>
+            </div>`;
+        } else {
+            var addButtonEl = document.createElement("li");
+            addButtonEl.innerHTML = `<button class="btn-add" onclick="addTraitCallback()"><i class="fas fa-plus"></i></button>`;
+            traitTDEl.querySelector("div.collapse ul").appendChild(addButtonEl);
+        }
     }
 }
 
 function addRowCallback() {
+
+    deleteRowMode = false;
+    deleteEntryMode = false;
+    document.getElementById('removeRowToggleButton').classList.add("btn-inactive");
+    document.getElementById('removeEntryToggleButton').classList.add("btn-inactive");
+
     var previewEl = document.getElementById("codePreview");
 
-    let listingTableEl = previewEl.querySelectorAll("table.table tbody")
+    var listingTableEl = previewEl.querySelectorAll("table.table tbody")
     listingTableEl = listingTableEl[listingTableEl.length - 1];
 
     var blankTableRow = document.createElement("tr");
+    blankTableRow.classList.add("valid-deleterow-target");
     blankTableRow.innerHTML = `<td>00000</td>
     <td style="width: 16.4035%;">@user</td>
     <td style="width: 17.0176%;">@user</td>
@@ -301,6 +352,96 @@ UploadFileEl.oninput = function () {
         }
     }
 };
+
+var deleteRowMode = false;
+var deleteEntryMode = false;
+
+function toggleRemoveRow() {
+    if (deleteRowMode) {
+        deleteRowMode = false;
+        document.getElementById('removeRowToggleButton').classList.add("btn-inactive");
+    } else {
+        deleteEntryMode = false;
+        deleteRowMode = true;
+        document.getElementById('removeEntryToggleButton').classList.add("btn-inactive");
+        document.getElementById('removeRowToggleButton').classList.remove("btn-inactive");
+    }
+}
+
+function toggleRemoveEntry() {
+    if (deleteEntryMode) {
+        deleteEntryMode = false;
+        document.getElementById('removeEntryToggleButton').classList.add("btn-inactive");
+    } else {
+        deleteRowMode = false;
+        deleteEntryMode = true;
+        document.getElementById('removeRowToggleButton').classList.add("btn-inactive");
+        document.getElementById('removeEntryToggleButton').classList.remove("btn-inactive");
+    }
+}
+
+function attemptDeleteRowCallback(e) {
+    if (deleteRowMode) {
+        e = e || window.event;
+
+        var target = e.target;
+        while (!target.classList.contains("valid-deleterow-target")) {
+            if (target.classList.contains("btn-add")) {
+                return;
+            }
+            target = target.parentElement;
+            if (target.tagName == "BODY") {
+                console.warn("Click was not contained inside a row marked deletable. Add the class\"valid-deleterow-target\" to the relevant <tr> tag to mark the row as deletable.")
+                return;
+            }
+        }
+
+        target.parentElement.removeChild(target);
+    }
+}
+
+function attemptDeleteEntryCallback(e) {
+    if (deleteEntryMode) {
+        e = e || window.event;
+
+        var target = e.target;
+        while (!target.classList.contains("valid-deleteentry-target")) {
+            target = target.parentElement;
+            if (target.tagName == "BODY") {
+                console.warn("Click was not contained inside a row marked deletable. Add the class\"valid-deleterow-target\" to the relevant <tr> tag to mark the row as deletable.")
+                return;
+            }
+        }
+
+        target.parentElement.removeChild(target);
+    }
+}
+
+window.addEventListener("click", attemptDeleteRowCallback);
+window.addEventListener("click", attemptDeleteEntryCallback);
+
+function finaliseAndDownload() {
+    // DONE: delete all valid-target, valid-deleterow-target, valid-deleteentry-target class references
+    // TODO: delete all the add trait buttons
+    // TODO: if there are no entries in the <ul> tag, change the <ul> into a <br/>
+    var validTargetEls = document.getElementsByClassName("valid-target");
+    var validDeleteRowTargetEls = document.getElementsByClassName("valid-deleterow-target");
+    var validDeleteEntryTargetEls = document.getElementsByClassName("valid-deleteentry-target");
+
+    for (let i = 0; i < validTargetEls.length; i++) {
+        validTargetEls[i].classList.remove("valid-target");
+    }
+
+    for (let i = 0; i < validDeleteRowTargetEls.length; i++) {
+        validDeleteRowTargetEls[i].classList.remove("valid-deleterow-target");
+    }
+
+    for (let i = 0; i < validDeleteEntryTargetEls.length; i++) {
+        validDeleteEntryTargetEls[i].classList.remove("valid-deleteentry-target");
+    }
+}
+
+document.getElementById("download-code-button").addEventListener("click", finaliseAndDownload);
 
 window.onclick = function (e) {
     //e = e || window.event;
