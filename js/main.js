@@ -1,86 +1,121 @@
 function IDFieldEditCallback(e) {
     e = e || window.event;
     /** @type HTMLElement */
-    e.target;
-    if (e.target.querySelector("div") != null && e.target.querySelector("div").classList.contains("temp-hover")) {
+
+    var target = e.target;
+    while (!target.classList.contains("valid-target")) {
+        target = target.parentElement;
+        if (target.tagName == "BODY") {
+            return;
+        }
+    }
+
+    if (target.querySelector("div") != null && target.querySelector("div").classList.contains("temp-hover")) {
         return;
     }
 
-    if (e.target.getElementsByTagName("div").length == 0) {
+    if (target.getElementsByTagName("div").length == 0) {
         var hoverInputContainer = document.createElement("div");
         var hoverInput = document.createElement("input");
 
-        hoverInput.value = e.target.innerText;
+        hoverInput.value = target.innerText;
         hoverInput.classList.add("temp-hover");
         hoverInputContainer.appendChild(hoverInput);
         hoverInputContainer.classList.add("hover-input-container");
         hoverInputContainer.classList.add("temp-hover");
 
         ///** @type DOMRect */
-        var rect = e.target.getBoundingClientRect();
-        //hoverInputContainer.style.top = (e.target.scrollTop + rect.top + rect.height / 2 + 6) + "px";
+        var rect = target.getBoundingClientRect();
+        //hoverInputContainer.style.top = (target.scrollTop + rect.top + rect.height / 2 + 6) + "px";
         //hoverInputContainer.style.left = rect.left + "px";
         hoverInput.style.width = rect.width + "px";
 
-        e.target.appendChild(hoverInputContainer);
+        target.appendChild(hoverInputContainer);
 
-        e.target.onkeydown = function (event) {
+        target.onkeydown = function (e) {
             e = e || window.event;
 
-            var inputEl = e.target.getElementsByTagName("input")[0];
-            if (event.keyCode == 13 && inputEl.value != "") {
+            var target = e.target;
+            while (!target.classList.contains("valid-target")) {
+                target = target.parentElement;
+                if (target.tagName == "BODY") {
+                    return;
+                }
+            }
+
+            var inputEl = target.getElementsByTagName("input")[0];
+            if (e.key == "Enter" && inputEl.value != "") {
                 // modifying the relevant id values
                 // if there is no div or a element this will fail
-                e.target.parentElement.children[5].querySelector("a").href = "#traits-" + inputEl.value;
-                e.target.parentElement.children[5].querySelector("div.collapse").id = "traits-" + inputEl.value;
-                e.target.parentElement.children[6].querySelector("a").href = "#change-" + inputEl.value;
-                e.target.parentElement.children[6].querySelector("div.collapse").id = "change-" + inputEl.value;
-                e.target.parentElement.children[7].querySelector("a").href = "#trade-" + inputEl.value;
-                e.target.parentElement.children[7].querySelector("div.collapse").id = "trade-" + inputEl.value;
-                console.log(e.target.parentElement.children[5].querySelector("a").href);
+                target.parentElement.children[5].querySelector("a").href = "#traits-" + inputEl.value;
+                target.parentElement.children[5].querySelector("div.collapse").id = "traits-" + inputEl.value;
+                target.parentElement.children[6].querySelector("a").href = "#change-" + inputEl.value;
+                target.parentElement.children[6].querySelector("div.collapse").id = "change-" + inputEl.value;
+                target.parentElement.children[7].querySelector("a").href = "#trade-" + inputEl.value;
+                target.parentElement.children[7].querySelector("div.collapse").id = "trade-" + inputEl.value;
+
                 // this already deletes the input box
-                e.target.innerText = inputEl.value;
+                target.innerText = inputEl.value;
             }
         }
     }
 }
 
-function fieldEditCallback(e) {
-    e = e || window.event;
-    /** @type HTMLElement */
-    e.target;
-    if (e.target.querySelector("div") != null && e.target.querySelector("div").classList.contains("temp-hover")) {
-        return;
-    }
+function makeFieldEditInput(e, inputBoxLengthMultiplier = 1) {
+    /** @type HTMLElement */ // declare for code autocomplete
 
-    if (e.target.getElementsByTagName("div").length == 0) {
-        var hoverInputContainer = document.createElement("div");
-        var hoverInput = document.createElement("input");
-
-        hoverInput.value = e.target.innerText;
-        hoverInput.classList.add("temp-hover");
-        hoverInputContainer.appendChild(hoverInput);
-        hoverInputContainer.classList.add("hover-input-container");
-        hoverInputContainer.classList.add("temp-hover");
-
-        ///** @type DOMRect */
-        var rect = e.target.getBoundingClientRect();
-        //hoverInputContainer.style.top = (e.target.scrollTop + rect.top + rect.height / 2 + 6) + "px";
-        //hoverInputContainer.style.left = rect.left + "px";
-        hoverInput.style.width = rect.width + "px";
-
-        e.target.appendChild(hoverInputContainer);
-
-        e.target.onkeydown = function (event) {
-            e = e || window.event;
-
-            var inputEl = e.target.getElementsByTagName("input")[0];
-            if (event.keyCode == 13 && inputEl.value != "") {
-                // this already deletes the input box
-                e.target.innerText = inputEl.value;
-            }
+    var target = e.target;
+    while (target.tagName != "LI" && !target.classList.contains("valid-target")) {
+        target = target.parentElement;
+        if (target.tagName == "BODY") {
+            return;
         }
     }
+
+    if (target.querySelector("div") != null && target.querySelector("div").classList.contains("temp-hover")) {
+        return; // if there is already an edit field, don't make another
+    }
+
+    var hoverInputContainer = document.createElement("div");
+    var hoverInput = document.createElement("input");
+
+    hoverInput.value = target.innerText;
+    hoverInput.classList.add("temp-hover");
+    hoverInputContainer.appendChild(hoverInput);
+    hoverInputContainer.classList.add("hover-input-container");
+    hoverInputContainer.classList.add("temp-hover");
+
+    ///** @type DOMRect */
+    var rect = target.getBoundingClientRect();
+    //hoverInputContainer.style.top = (e.target.scrollTop + rect.top + rect.height / 2 + 6) + "px";
+    //hoverInputContainer.style.left = rect.left + "px";
+    hoverInput.style.width = rect.width * inputBoxLengthMultiplier + "px";
+
+    target.appendChild(hoverInputContainer);
+
+    target.onkeydown = function (e) {
+        e = e || window.event;
+        while (target.tagName != "LI" && !target.classList.contains("valid-target")) {
+            target = target.parentElement;
+            if (target.tagName == "BODY") {
+                return;
+            }
+        }
+        var inputEl = target.getElementsByTagName("input")[0];
+        if (e.key == "Enter" && inputEl.value != "") {
+            // this already deletes the input box
+            target.innerText = inputEl.value;
+        }
+    }
+}
+
+function fieldEditCallback(e) {
+    makeFieldEditInput(e, 1);
+}
+
+/** This is just a slightly different fieldEditCallback function */
+function longFieldEditCallback(e) {
+    makeFieldEditInput(e, 2.5);
 }
 
 function linkEditCallback(e) {
@@ -214,7 +249,35 @@ function raritySelectorCallback(e) {
     target.appendChild(hoverInputContainer);
 }
 
+function traitEditCallback(e) {
+    e = e || window.event;
+
+    var target = e.target;
+}
+
 function addTraitCallback(e) {
+    e = e || window.event;
+
+    deleteRowMode = false;
+    deleteEntryMode = false;
+    document.getElementById('removeRowToggleButton').classList.add("btn-inactive");
+    document.getElementById('removeEntryToggleButton').classList.add("btn-inactive");
+
+    var target = e.target;
+    while (target.tagName != "LI") {
+        target = target.parentElement;
+        if (target.tagName == "BODY") {
+            console.error("Click target not contained within an <li> tag. Cannot insert new trait.");
+            return;
+        }
+    }
+    var newTraitEl = document.createElement("li");
+    newTraitEl.classList.add("valid-deleteentry-target");
+    newTraitEl.innerHTML = `<a class="btn btn-sm bg-info tooltipster" data-toggle="tooltip" title="Common">TRAIT</a>`;
+    target.parentElement.insertBefore(newTraitEl, target);
+}
+
+function addEntryCallback(e) {
     e = e || window.event;
 
     var target = e.target;
@@ -231,10 +294,11 @@ function addTraitCallback(e) {
             return;
         }
     }
-    var newTraitEl = document.createElement("li");
-    newTraitEl.classList.add("valid-deleteentry-target");
-    newTraitEl.innerHTML = `<a class="btn btn-sm bg-info tooltipster" data-toggle="tooltip" title="Common">TRAIT</a>`;
-    target.parentElement.insertBefore(newTraitEl, target);
+    var newEntryEl = document.createElement("li");
+    newEntryEl.classList.add("valid-deleteentry-target");
+    newEntryEl.innerHTML = `log entry`;
+    newEntryEl.onclick = longFieldEditCallback;
+    target.parentElement.insertBefore(newEntryEl, target);
 }
 
 function initializeEditor(filestring) {
@@ -247,7 +311,7 @@ function initializeEditor(filestring) {
         var currentRowEls = listingRowEls[i].getElementsByTagName("td");
         currentRowEls[0].onclick = IDFieldEditCallback;
         currentRowEls[0].classList.add("valid-target");
-        for (var j = 1; j < 3; j++) {
+        for (let j = 1; j < 3; j++) {
             currentRowEls[j].onclick = fieldEditCallback;
             currentRowEls[j].classList.add("valid-target");
         }
@@ -258,12 +322,11 @@ function initializeEditor(filestring) {
 
         // make all entries deletable
         var entryEls = listingRowEls[i].querySelectorAll("div.collapse li");
-        console.log(entryEls);
         for (let k = 0; k < entryEls.length; k++) {
             entryEls[k].classList.add("valid-deleteentry-target");
         }
 
-        // put this after so the button isn't marked as deletable
+        // put this after so the add buttons aren't marked as deletable
         var traitTDEl = currentRowEls[5];
         if (traitTDEl.querySelector("li") == null) {
             traitTDEl.innerHTML = `<a data-toggle="collapse" href="#traits-${currentRowEls[0].innerText}">View All</a>
@@ -273,9 +336,54 @@ function initializeEditor(filestring) {
                 </ul>
             </div>`;
         } else {
+            // make all traits editable before making the add button
+            var currentRowTraitEls = changeTDEl.querySelectorAll("li");
+            for (let j = 0; j < currentRowTraitEls.length; j++) {
+                currentRowTraitEls[j].onclick = traitEditCallback;
+            }
+            // add button
             var addButtonEl = document.createElement("li");
             addButtonEl.innerHTML = `<button class="btn-add" onclick="addTraitCallback()"><i class="fas fa-plus"></i></button>`;
             traitTDEl.querySelector("div.collapse ul").appendChild(addButtonEl);
+        }
+        var changeTDEl = currentRowEls[6];
+        if (changeTDEl.querySelector("li") == null) {
+            changeTDEl.innerHTML = `<a data-toggle="collapse" href="#change-${currentRowEls[0].innerText}">View All</a>
+            <div class="collapse" id="change-${currentRowEls[0].innerText}">
+                <ul class="list-unstyled">
+                    <li><button class="btn-add" onclick="addEntryCallback()"><i class="fas fa-plus"></i></button></li>
+                </ul>
+            </div>`;
+        } else {
+            // make all entries editable before making the add button
+            var currentRowChangeEntryEls = changeTDEl.querySelectorAll("li");
+            for (let j = 0; j < currentRowChangeEntryEls.length; j++) {
+                currentRowChangeEntryEls[j].onclick = longFieldEditCallback;
+            }
+            // add button
+            var addButtonEl = document.createElement("li");
+            addButtonEl.innerHTML = `<button class="btn-add" onclick="addEntryCallback()"><i class="fas fa-plus"></i></button>`;
+            changeTDEl.querySelector("div.collapse ul").appendChild(addButtonEl);
+        }
+        //----------
+        var tradeTDEl = currentRowEls[7];
+        if (tradeTDEl.querySelector("li") == null) {
+            tradeTDEl.innerHTML = `<a data-toggle="collapse" href="#trade-${currentRowEls[0].innerText}">View All</a>
+            <div class="collapse" id="trade-${currentRowEls[0].innerText}">
+                <ul class="list-unstyled">
+                    <li><button class="btn-add" onclick="addEntryCallback()"><i class="fas fa-plus"></i></button></li>
+                </ul>
+            </div>`;
+        } else {
+            // make all entries editable before making the add button
+            var currentRowTradeEntryEls = tradeTDEl.querySelectorAll("li");
+            for (let j = 0; j < currentRowTradeEntryEls.length; j++) {
+                currentRowTradeEntryEls[j].onclick = longFieldEditCallback;
+            }
+            // add button
+            var addButtonEl = document.createElement("li");
+            addButtonEl.innerHTML = `<button class="btn-add" onclick="addEntryCallback()"><i class="fas fa-plus"></i></button>`;
+            tradeTDEl.querySelector("div.collapse ul").appendChild(addButtonEl);
         }
     }
 }
@@ -289,7 +397,7 @@ function addRowCallback() {
 
     var previewEl = document.getElementById("codePreview");
 
-    var listingTableEl = previewEl.querySelectorAll("table.table tbody")
+    var listingTableEl = previewEl.querySelectorAll("table.table tbody");
     listingTableEl = listingTableEl[listingTableEl.length - 1];
 
     var blankTableRow = document.createElement("tr");
@@ -324,7 +432,7 @@ function addRowCallback() {
     listingTableEl.appendChild(blankTableRow);
 
     var currentRowEls = blankTableRow.getElementsByTagName("td");
-    for (var j = 0; j < 3; j++) {
+    for (let j = 0; j < 3; j++) {
         currentRowEls[j].onclick = fieldEditCallback;
         currentRowEls[j].classList.add("valid-target");
     }
@@ -346,7 +454,7 @@ UploadFileEl.oninput = function () {
                 initializeEditor(result);
             }, function (error) {
                 console.error(`File loading error: ${error}.`);
-            })
+            });
         } else {
             console.warn(fileName + " may not be a valid html file. Continuing anyways.");
         }
@@ -391,7 +499,7 @@ function attemptDeleteRowCallback(e) {
             }
             target = target.parentElement;
             if (target.tagName == "BODY") {
-                console.warn("Click was not contained inside a row marked deletable. Add the class\"valid-deleterow-target\" to the relevant <tr> tag to mark the row as deletable.")
+                console.warn("Click was not contained inside a row marked deletable. Add the class \"valid-deleterow-target\" to the relevant <tr> tag to mark the row as deletable.");
                 return;
             }
         }
@@ -408,7 +516,7 @@ function attemptDeleteEntryCallback(e) {
         while (!target.classList.contains("valid-deleteentry-target")) {
             target = target.parentElement;
             if (target.tagName == "BODY") {
-                console.warn("Click was not contained inside a row marked deletable. Add the class\"valid-deleterow-target\" to the relevant <tr> tag to mark the row as deletable.")
+                console.warn("Click was not contained inside a entry marked deletable. Add the class \"valid-deleteentry-target\" to the relevant <li> tag to mark the entry as deletable.");
                 return;
             }
         }
@@ -428,17 +536,9 @@ function finaliseAndDownload() {
     var validDeleteRowTargetEls = document.getElementsByClassName("valid-deleterow-target");
     var validDeleteEntryTargetEls = document.getElementsByClassName("valid-deleteentry-target");
 
-    for (let i = 0; i < validTargetEls.length; i++) {
-        validTargetEls[i].classList.remove("valid-target");
-    }
-
-    for (let i = 0; i < validDeleteRowTargetEls.length; i++) {
-        validDeleteRowTargetEls[i].classList.remove("valid-deleterow-target");
-    }
-
-    for (let i = 0; i < validDeleteEntryTargetEls.length; i++) {
-        validDeleteEntryTargetEls[i].classList.remove("valid-deleteentry-target");
-    }
+    while (0 < validTargetEls.length) validTargetEls[0].classList.remove("valid-target"); // the list shrinks itself as the class is removed (HTMLCollectionOf is live)
+    while (0 < validDeleteRowTargetEls.length) validDeleteRowTargetEls[0].classList.remove("valid-deleterow-target");
+    while (0 < validDeleteEntryTargetEls.length) validDeleteEntryTargetEls[0].classList.remove("valid-deleteentry-target");
 }
 
 document.getElementById("download-code-button").addEventListener("click", finaliseAndDownload);
