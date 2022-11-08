@@ -208,7 +208,7 @@ function raritySelectorCallback(e) {
 
     if (target == null) {
         return;
-    }
+    } // now it's a valid target
 
     if (target.querySelector("div") != null && target.querySelector("div").classList.contains("temp-hover")) {
         // making sure there are no duplicates
@@ -253,6 +253,100 @@ function traitEditCallback(e) {
     e = e || window.event;
 
     var target = e.target;
+    while (!target.classList.contains("valid-target")) {
+        if (target.tagName == "BODY") {
+            console.warn("Click target was not inside an element with the class valid-target.");
+            return;
+        }
+
+        target = target.parentElement;
+    }
+
+    if (target.querySelector("div") != null && target.querySelector("div").classList.contains("temp-hover")) {
+        // making sure there are no duplicates
+        return;
+    }
+
+    var hoverInputContainer = document.createElement("div");
+    hoverInputContainer.classList.add("hover-input-container");
+    hoverInputContainer.classList.add("temp-hover");
+    hoverInputContainer.style.paddingLeft = "8px";
+    hoverInputContainer.style.paddingRight = "8px";
+    
+    var inputFieldEl = document.createElement("input");
+    inputFieldEl.value = target.getElementsByTagName("a")[0].innerText;
+    inputFieldEl.style.width = target.getBoundingClientRect().width + "px";
+    hoverInputContainer.appendChild(inputFieldEl);
+
+    hoverInputContainer.insertAdjacentHTML("beforeend", `
+    <a class="btn btn-sm bg-info tooltipster" data-toggle="tooltip" title="Common"><i
+    class="fas fa-star"></i></a>
+<a class="btn btn-sm bg-success tooltipster" data-toggle="tooltip" title="Uncommon"><i
+    class="fas fa-star"></i><i class="fas fa-star"></i></a>
+<a class="btn btn-sm bg-secondary tooltipster" data-toggle="tooltip" title="Rare"><i
+    class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></a>
+<a class="btn btn-sm bg-danger tooltipster" data-toggle="tooltip" title="Legendary"><i
+    class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+    class="fas fa-star"></i></a>
+<a class="btn btn-sm bg-warning tooltipster" data-toggle="tooltip" title="Mythical"><i
+    class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+    class="fas fa-star"></i><i class="fas fa-star"></i></a>
+<a class="btn btn-sm bg-light tooltipster" data-toggle="tooltip" title="Exclusive"><i
+    class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+    class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></a>`);
+
+    var raritySelectorEls = hoverInputContainer.getElementsByTagName("a");
+    for (let i = 0; i < raritySelectorEls.length; i++) {
+        if (raritySelectorEls[i].title == target.getElementsByTagName("a")[0].title) {
+            raritySelectorEls[i].style.border = "2px solid white";
+            raritySelectorEls[i].classList.add("selected-rarity");
+        }
+        raritySelectorEls[i].onclick = function (e) {
+            e = e || window.event;
+            
+            var target = e.target;
+            if (!target.classList.contains("btn")) {
+                target = target.parentElement;
+            }
+
+            var siblings = target.parentElement.children;
+            for (let i = 0; i < siblings.length; i++) {
+                siblings[i].style.border = "none";
+                siblings[i].classList.remove("selected-rarity");
+            }
+
+            target.style.border = "2px solid white";
+            target.classList.add("selected-rarity");
+        }
+    }
+
+    inputFieldEl.onkeydown = function (e) {
+        e = e || window.event;
+        e.preventDefault();
+        
+        var inputEl = e.target;
+        var editTargetEl = e.target;
+
+        while (!editTargetEl.classList.contains("valid-target")) {
+            if (editTargetEl.tagName == "BODY") {
+                console.warn("The input field was not contained within a valid target marked with the class \"valid-target\".");
+                return;
+            }
+            editTargetEl = editTargetEl.parentElement;
+        }
+
+        if (e.key == "Enter" && inputEl.value != "" && inputEl.parentElement.querySelector("a.selected-rarity") != null) {
+            var rarityClone = inputEl.parentElement.querySelector("a.selected-rarity").cloneNode();
+            rarityClone.classList.remove("selected-rarity");
+            rarityClone.style.border = "";
+            var changedValue = inputEl.value;
+            editTargetEl.innerHTML = "";
+            editTargetEl.appendChild(rarityClone);
+            editTargetEl.children[0].innerText = changedValue;
+        }
+    }
+
+    target.appendChild(hoverInputContainer);
 }
 
 function addTraitCallback(e) {
@@ -337,9 +431,10 @@ function initializeEditor(filestring) {
             </div>`;
         } else {
             // make all traits editable before making the add button
-            var currentRowTraitEls = changeTDEl.querySelectorAll("li");
+            var currentRowTraitEls = traitTDEl.querySelectorAll("li");
             for (let j = 0; j < currentRowTraitEls.length; j++) {
                 currentRowTraitEls[j].onclick = traitEditCallback;
+                currentRowTraitEls[j].classList.add("valid-target");
             }
             // add button
             var addButtonEl = document.createElement("li");
