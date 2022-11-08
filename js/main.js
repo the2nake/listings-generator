@@ -272,7 +272,7 @@ function traitEditCallback(e) {
     hoverInputContainer.classList.add("temp-hover");
     hoverInputContainer.style.paddingLeft = "8px";
     hoverInputContainer.style.paddingRight = "8px";
-    
+
     var inputFieldEl = document.createElement("input");
     inputFieldEl.value = target.getElementsByTagName("a")[0].innerText;
     inputFieldEl.style.width = target.getBoundingClientRect().width + "px";
@@ -303,7 +303,7 @@ function traitEditCallback(e) {
         }
         raritySelectorEls[i].onclick = function (e) {
             e = e || window.event;
-            
+
             var target = e.target;
             if (!target.classList.contains("btn")) {
                 target = target.parentElement;
@@ -323,7 +323,7 @@ function traitEditCallback(e) {
     inputFieldEl.onkeydown = function (e) {
         e = e || window.event;
         e.preventDefault();
-        
+
         var inputEl = e.target;
         var editTargetEl = e.target;
 
@@ -625,15 +625,38 @@ window.addEventListener("click", attemptDeleteEntryCallback);
 
 function finaliseAndDownload() {
     // DONE: delete all valid-target, valid-deleterow-target, valid-deleteentry-target class references
-    // TODO: delete all the add trait buttons
-    // TODO: if there are no entries in the <ul> tag, change the <ul> into a <br/>
+    // DONE: delete all the add trait buttons
+    // DONE: if there are no entries in the <ul> tag, change the <ul> into a <br/>
     var validTargetEls = document.getElementsByClassName("valid-target");
     var validDeleteRowTargetEls = document.getElementsByClassName("valid-deleterow-target");
     var validDeleteEntryTargetEls = document.getElementsByClassName("valid-deleteentry-target");
 
-    while (0 < validTargetEls.length) validTargetEls[0].classList.remove("valid-target"); // the list shrinks itself as the class is removed (HTMLCollectionOf is live)
+    // the list shrinks itself as the class is removed (HTMLCollectionOf is live)
+    while (0 < validTargetEls.length) validTargetEls[0].classList.remove("valid-target");
     while (0 < validDeleteRowTargetEls.length) validDeleteRowTargetEls[0].classList.remove("valid-deleterow-target");
     while (0 < validDeleteEntryTargetEls.length) validDeleteEntryTargetEls[0].classList.remove("valid-deleteentry-target");
+
+    var previewEl = document.getElementById("codePreview");
+    var addEntryButtons = previewEl.getElementsByClassName("btn-add");
+
+    // this removes the <li> element that contains the button
+    while (0 < addEntryButtons.length) addEntryButtons[0].parentElement.parentElement.removeChild(addEntryButtons[0].parentElement);
+
+    // querySelectorAll returns a static (not live) collection
+    const expandableListEls = previewEl.querySelectorAll("ul.list-unstyled");
+    for (let i = 0; i < expandableListEls.length; i++) {
+        if (expandableListEls[i].querySelectorAll("li").length == 0) {
+            expandableListEls[i].parentElement.innerHTML = "<br/>";
+        }
+    }
+
+    const finalisedHTMLString = previewEl.innerHTML;
+    var strData = new Blob([finalisedHTMLString], {type: 'text/html'});
+    var finalFileLink = window.URL.createObjectURL(strData);
+    var temporaryLinkClickTarget = document.createElement("a");
+    temporaryLinkClickTarget.setAttribute('download', 'listing-code.html');
+    temporaryLinkClickTarget.href = finalFileLink;
+    temporaryLinkClickTarget.click();
 }
 
 document.getElementById("download-code-button").addEventListener("click", finaliseAndDownload);
